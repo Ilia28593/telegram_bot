@@ -1,0 +1,16 @@
+bot:
+  name: ${BOT_NAME:VaulterixExchangeDataBot}
+  token: ${BOT_TOKEN:6798957645:AAHQM74GjK4SyfKC64B58-1zNYE-OdMxlRQ}
+
+info:
+  login: ${INFO_LOGIN:sitnik@mitrasoft.ru}
+  password: ${INFO_PASSWORD:4567822350Zx!}
+  url: ${URL_PATH:https://dev2.vaulterix.ru/}
+infos:
+  login: ${INFO_LOGIN:sitnik@mitrasoft.ru}
+
+service:
+  file_info:
+    uri: https://api.telegram.org/bot{token}/getFile?file_id={fileId}
+  file_storage:
+    uri: https://api.telegram.org/file/bot{token}/{filePath}
