@@ -3,11 +3,9 @@ bot:
   token: ${BOT_TOKEN:6798957645:AAHQM74GjK4SyfKC64B58-1zNYE-OdMxlRQ}
 
 info:
-  login: ${INFO_LOGIN:sitnik@mitrasoft.ru}
-  password: ${INFO_PASSWORD:4567822350Zx!}
-  url: ${URL_PATH:https://dev2.vaulterix.ru/}
-infos:
-  login: ${INFO_LOGIN:sitnik@mitrasoft.ru}
+  login: ${INFO_LOGIN:noreply@mitrasoft.ru}
+  password: ${INFO_PASSWORD:!changeMe1}
+  url: ${URL_PATH:https://vdr.vaulterix.ru/}
 
 service:
   file_info:

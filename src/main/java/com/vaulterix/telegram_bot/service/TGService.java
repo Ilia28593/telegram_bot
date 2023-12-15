@@ -63,23 +63,16 @@ public class TGService implements BotService {
         var response = getFilePath(fileId);
         if (response.getStatusCode() == HttpStatus.OK) {
             String folderId = getFolderId(chatId, loginResponse);
-            sendFile(response, folderId, loginResponse.getAccessToken(), telegramDoc.getFileName(), telegramDoc.getFileSize());
+            try {
+                sendFile(response, folderId, loginResponse.getAccessToken(), telegramDoc.getFileName(), telegramDoc.getFileSize());
+            } catch (Exception e) {
+                return "Фаил с таким имененм уже существует.";
+            }
             return "Фаил успешно загружен:\n" + telegramDoc.getFileName();
         } else {
-            throw new UploadFileException("Bad response from telegram service:\n" + response);
+           return "Произошла ошибка при отправки данных. Пожалуйста введите \"старт\".";
         }
     }
-
-    @Override
-    public void consumeTextMessageUpdates(Update update) {
-
-    }
-
-    @Override
-    public void consumeDocMessageUpdates(Update update) {
-
-    }
-
     @Override
     public String consumePhotoMessageUpdates(Update update) {
         LoginResponse loginResponse = requestService.getLoginResponse();
@@ -93,7 +86,12 @@ public class TGService implements BotService {
         if (response.getStatusCode() == HttpStatus.OK) {
             String fileName = List.of(getFilePath(response).split("/")).get(1);
             String folderId = getFolderId(chatId, loginResponse);
-            sendFile(response, folderId, loginResponse.getAccessToken(), fileName, update.getMessage().getPhoto().size());
+            try {
+                sendFile(response, folderId, loginResponse.getAccessToken(), fileName, update.getMessage().getPhoto().size());
+            } catch (Exception e) {
+                return "Фаил с таким имененм уже существует.";
+            }
+
             return "Картинка успешно загружена.";
         } else {
             throw new UploadFileException("Bad response from telegram service: " + response);
@@ -244,7 +242,7 @@ public class TGService implements BotService {
             try {
                 if (requestService.checkEmailCreateInVaulterix(email)) {
                     createUser(email, chatId);
-                    return "е-mail:" + email + " принят.\nВведите почтовые адреса получателей через запятую. И нажмите далее.";
+                    return "е-mail:\n" + email + " принят.\nВведите почтовые адреса получателей через запятую. И нажмите далее.";
                 }
             } catch (Exception e) {
                 return email + ": данный  е-mail не зарегистрирован в Vaulterix.";

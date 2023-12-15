@@ -3,6 +3,7 @@ package com.vaulterix.telegram_bot.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vaulterix.telegram_bot.dto.AuthorizationUserDto;
+import com.vaulterix.telegram_bot.exceptions.UploadFileException;
 import com.vaulterix.telegram_bot.model.shares.CreateSharedLinkRequest;
 import com.vaulterix.telegram_bot.request.CreateFolderRequest;
 import com.vaulterix.telegram_bot.request.ShareRequest;
@@ -26,9 +27,7 @@ import java.util.Collections;
 @Slf4j
 @RequiredArgsConstructor
 public class RequestService {
-//    private final ConnectionConfig config;
-
-    @Value("${infos.login}")
+    @Value("${info.login}")
     private String name;
     @Value("${info.password}")
     private String password;
@@ -58,11 +57,12 @@ public class RequestService {
     }
 
     public FolderDataResponse createFolder(LoginResponse loginResponse, String userEmail) {
+        FolderDataResponse rootFolder = getRootFolder(loginResponse);
         int indexTo = userEmail.indexOf("@");
         String substring = userEmail.substring(0, indexTo);
         CreateFolderRequest createFolderRequest = new CreateFolderRequest()
                 .setFolderName(substring + "_" + OffsetDateTime.now().toInstant().toEpochMilli())
-                .setParentId("1c8d3214-a399-4246-bac8-fda7de613db6")
+                .setParentId(rootFolder.getId())
                 .setUserId(loginResponse.getUserId());
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -92,7 +92,7 @@ public class RequestService {
             keyResponse = mapper.readValue(response, UploadKeyResponse.class);
         } catch (JsonProcessingException e) {
             log.error("Failed get or parse log history from log collector");
-            return null;
+            throw new UploadFileException("Bad response from telegram service: " + response);
         }
         return keyResponse;
     }
@@ -146,6 +146,23 @@ public class RequestService {
             return null;
         }
         return shareRequest;
+    }
+
+    public FolderDataResponse getRootFolder(LoginResponse loginResponse) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", loginResponse.getAccessToken());
+        String url = urlPath + "api/v1/folder/root";
+        HttpEntity<Object> entity = new HttpEntity<>(null, headers);
+        String response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class).getBody();
+        FolderDataResponse folderDataResponse;
+        try {
+            folderDataResponse = mapper.readValue(response, FolderDataResponse.class);
+        } catch (JsonProcessingException e) {
+            log.error("Failed get or parse log history from log collector");
+            return null;
+        }
+        return folderDataResponse;
     }
 
     public UploadChunkResponse loadChunk(byte[] fileInByte, UploadKeyResponse uploadKey, int packageNumber, int fromByte, String accessToken) {

@@ -32,10 +32,10 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private String description = "1.\tДля того чтобы воспользоваться ботом вы должны быть зарегистрированы в Vaulterix.\n" +
             "2.\tОтправьте команду «старт».\n" +
-            "3.\tВведите почтовый адрес пользователя, зарегистрированного в Vaulterix.\n" +
+            "3.\tВведите ваш почтовый адрес пользователя, зарегистрированного в Vaulterix.\n" +
             "4.\tПо получению ответа «почтовый адрес принят» ведите почтовый адрес получателя.\n" +
             "5.\tПрикрепите файл/файлы и дождитесь сообщения о загрузке файлов.\n" +
-            "6.\tОтправьте команду «поделиться». \n" +
+            "6.\tОтправьте команду «далее». \n" +
             "7.\tДля возобновления отправьте команду «старт».";
 
     @Override
@@ -75,8 +75,8 @@ public class TelegramBot extends TelegramLongPollingBot {
                     switch (messageText.toLowerCase()) {
                         case "/start":
                             service.clean(chatId);
-                            sendMessage(chatId, "Добрый день " + update.getMessage().getChat().getFirstName() +
-                                    "\n Вас приветствует  бот Vaulterix компании MitraSoft!");
+                            sendMessage(chatId, "Добрый день, " + update.getMessage().getChat().getFirstName() + "." +
+                                    "\nВас приветствует  бот Vaulterix компании MitraSoft!");
                             keybordRequest(chatId, "Справка", "help", "Для получения справки нажмите справка");
                             sendMessage(chatId, "Введите Ваш е-mail пользователя Vaulterix.");
                             break;
@@ -91,13 +91,12 @@ public class TelegramBot extends TelegramLongPollingBot {
 
                         default:
                             keybordRequest(chatId, "Справка", "help", "Данная команда не поддерживается, следуйте указаниям бота. " +
-                                    "\n Для получения справки нажмите справка");
+                                    "\nДля получения справки нажмите справка");
                     }
                 }
             } else if (update.getMessage().hasDocument()) {
                 checkSendFile(chatId);
                 sendMessage(chatId, service.shareDoc(update.getMessage(), chatId));
-                sendMessage(chatId);
             } else if (update.getMessage().hasPhoto()) {
                 checkSendFile(chatId);
                 sendMessage(chatId, botService.consumePhotoMessageUpdates(update));
@@ -111,7 +110,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             }
             if (callbackData.equals("start")) {
                 service.clean(chatId);
-                sendMessage(chatId, "Для обмена данных введите е-mail технического пользователя Vaulterix.");
+                sendMessage(chatId, "Введите Ваш е-mail пользователя Vaulterix.");
             }
             if (callbackData.equals("share")) {
                 sendMessage(chatId, service.createLinkByShares(chatId));
@@ -188,7 +187,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             }
         });
         if (badEmail.toString().isEmpty()) {
-                sendMassageByAddButton(chatId, "е-mail's добавлены для рассылки:" + acceptedEmail + "\n прикрепите файлы");
+            sendMassageByAddButton(chatId, "е-mail's добавлены для рассылки:" + acceptedEmail + "\n прикрепите файлы");
         } else {
             sendMessage(chatId, badEmail.toString());
         }
@@ -201,6 +200,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         message.setReplyMarkup(replyKeyboardMaker.getMainMenuKeyboard());
         sendMessage(message);
     }
+
     private void sendMessage(SendMessage message) {
         try {
             execute(message);
@@ -209,6 +209,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             throw new RuntimeException(e);
         }
     }
+
     private String checkEmailAndAddResponse(String messageText, long chatId, Pattern pattern) {
         if (pattern.matcher(messageText).matches()) {
             return service.sveUserResponse(messageText, chatId);
@@ -216,12 +217,14 @@ public class TelegramBot extends TelegramLongPollingBot {
             return messageText + ": данный  е-mail не валиден.";
         }
     }
+
     private void sendMessage(long chatId) {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
         message.setReplyMarkup(new ReplyKeyboardRemove());
         sendMessage(message);
     }
+
     private void sendMessage(long chatId, String textToSend) {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));

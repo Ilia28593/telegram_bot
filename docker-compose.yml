@@ -1,0 +1,13 @@
+version: '3.1'
+services:
+  telegram_bot:
+    build: src
+    container_name: telegram-server
+    ports:
+      - "9090:9090"
+    environment:
+      - BOT_NAME=VaulterixExchangeDataBot
+      - BOT_TOKEN=6798957645:AAHQM74GjK4SyfKC64B58-1zNYE-OdMxlRQ
+      - INFO_LOGIN=noreply@mitrasoft.ru
+      - INFO_PASSWORD=!changeMe1
+      - URL_PATH=https://vdr.vaulterix.ru/
